@@ -20,7 +20,8 @@ class Tag(models.Model):
         unique=True,
         blank=False,
     )
-    
+
+
 class Ingredient(models.Model):
     name = models.CharField(
         max_length=settings.NAME_LENGTH,
