@@ -8,10 +8,10 @@ ERROR_MESSAGE = 'Имя пользователя содержит недопус
 
 def validate_username(value):
     if (settings.MIN_USERNAME > len(value)
-       or settings.MAX_USERNAME > len(value)):
+       or settings.MAX_USERNAME < len(value)):
         raise ValidationError(
             f'допустимая длина от {settings.MIN_USERNAME} до'
-            f'"{settings.MAX_USERNAME}" символов.'
+            f' {settings.MAX_USERNAME} символов.'
         )
     invalid_chars = set(re.findall(settings.EXCEPTION_CHARACTERS, value))
     if invalid_chars:

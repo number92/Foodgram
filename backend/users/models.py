@@ -8,7 +8,7 @@ from .validators import validate_username
 class User(AbstractUser):
     """Класс пользователей."""
     username = models.CharField(
-        max_length=settings.NAME_LENGTH,
+        max_length=settings.NAME_LENGHT,
         verbose_name='Имя пользователя',
         unique=True,
         blank=False,
@@ -18,7 +18,7 @@ class User(AbstractUser):
                    f'до {settings.MAX_USERNAME} символов')
     )
     email = models.EmailField(
-        max_length=settings.EMAIL_LENGTH,
+        max_length=settings.EMAIL_LENGHT,
         verbose_name='Email',
         unique=True,
         blank=False
@@ -47,6 +47,8 @@ class Follow(models.Model):
         return (f'{self.user}, {self.following.username}')
 
     class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'following'],

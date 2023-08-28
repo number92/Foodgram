@@ -27,6 +27,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'users.apps.UsersConfig',
+    'api.apps.ApiConfig',
+    'recipes.apps.RecipesConfig',
 ]
 
 MIDDLEWARE = [
@@ -70,6 +73,7 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = "users.User"
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
@@ -107,7 +111,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
@@ -115,8 +122,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Registration user settings
 EXCEPTION_CHARACTERS = r'[^\w.@+-]'
-NAME_LENGTH = 150
+NAME_LENGHT = 150
 MIN_USERNAME = 3
 MAX_USERNAME = 24
-EMAIL_LENGTH = 254
-COLOR_LENGTH = 7
+EMAIL_LENGHT = 254
+COLOR_LENGHT = 7
+UNIT_LENGHT = 24
+TEXT_LENGHT = 3000
+MIN_AMOUNT = 1
