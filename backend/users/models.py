@@ -13,13 +13,13 @@ class User(AbstractUser):
         unique=True,
         blank=False,
         validators=[validate_username],
-        help_text=(f'Напишите ваше имя пользователя длиной'
+        help_text=(f'Напишите ваше имя пользователя длиной '
                    f'от {settings.MIN_USERNAME} '
                    f'до {settings.MAX_USERNAME} символов')
     )
     email = models.EmailField(
         max_length=settings.EMAIL_LENGHT,
-        verbose_name='Email',
+        verbose_name='Электронная почта',
         unique=True,
         blank=False
     )
