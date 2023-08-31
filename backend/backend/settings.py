@@ -15,7 +15,7 @@ SECRET_KEY = 'django-insecure-jg%rw#u=8h+&8%d79jd$h8(6qaf8zk0mqy2(f@xromh4^p!i*y
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost']
 
 
 # Application definition
@@ -27,6 +27,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'djoser',
     'users.apps.UsersConfig',
     'api.apps.ApiConfig',
     'recipes.apps.RecipesConfig',
@@ -93,8 +96,38 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/3.2/topics/i18n/
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ],
+    'DEFAULT_PAGINATION_CLASS': [
+        'api.pagination.LimitPagination',
+    ],
+    'PAGE_SIZE': 5,
+    'SEARCH_PARAM': 'name',
+}
+
+DJOSER = {
+       'LOGIN_FIELD': 'email',
+       'SERIALIZERS': {
+            'user_create': 'api.serializers.UserCreateSerializer',
+            'user': 'api.serializers.UserListSerializer',
+            'current_user': 'api.serializers.UserListSerializer',
+            'set_password': 'djoser.serializers.SetPasswordSerializer'
+       },
+       'HIDE_USERS': False,
+       'PERMISSIONS': {
+           'user_list': ['rest_framework.permissions.AllowAny'],
+           'user': ['djoser.permissions.CurrentUserOrAdminOrReadOnly'],
+           'set_password': ['djoser.permissions.CurrentUserOrAdmin'],
+       },
+   }
 
 LANGUAGE_CODE = 'en-ru'
 
