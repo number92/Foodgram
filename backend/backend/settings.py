@@ -15,7 +15,7 @@ SECRET_KEY = 'django-insecure-jg%rw#u=8h+&8%d79jd$h8(6qaf8zk0mqy2(f@xromh4^p!i*y
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -125,7 +125,12 @@ DJOSER = {
        'PERMISSIONS': {
            'user_list': ['rest_framework.permissions.AllowAny'],
            'user': ['djoser.permissions.CurrentUserOrAdminOrReadOnly'],
+           'activation': ['rest_framework.permissions.IsAdminUser'],
+           'password_reset': ['rest_framework.permissions.IsAdminUser'],
+           'password_reset_confirm': ['rest_framework.permissions.IsAdminUser'],
            'set_password': ['djoser.permissions.CurrentUserOrAdmin'],
+           'username_reset': ['rest_framework.permissions.IsAdminUser'],
+           'username_reset_confirm': ['rest_framework.permissions.IsAdminUser'],
        },
    }
 

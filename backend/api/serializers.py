@@ -3,18 +3,32 @@ from django.conf import settings
 from djoser.serializers import UserSerializer, UserCreateSerializer
 
 from rest_framework import serializers
-
+from rest_framework.validators import UniqueTogetherValidator
 from users.models import User, Follow
 
 
-class UserListSerializer(UserSerializer):
+class SubscribeMixin(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField()
+
+    def get_is_subscribed(self, obj):
+        user_id = obj.id if isinstance(obj, User) else obj.user.id
+        request_user = self.context.get('request').user.id
+        queryset = Follow.objects.filter(
+            user=user_id,
+            following=request_user).exists()
+        return queryset
+
+
+class UserListSerializer(UserSerializer, SubscribeMixin):
+    """Список Пользователей, Профиль"""
+    # is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = (
             'email', 'id', 'username',
-            'first_name', 'last_name', 'is_subscribed'
+            'first_name', 'last_name',
+            'is_subscribed'
             )
 
     def get_is_subscribed(self, obj):
@@ -40,8 +54,9 @@ class UserCreateSerializer(UserCreateSerializer):
         }
 
 
-class SubscriptionSerializer(UserListSerializer):
+class SubscriptionSerializer(UserListSerializer, SubscribeMixin):
     """Список подписчиков"""
+
     class Meta:
         model = User
         fields = (
@@ -49,4 +64,71 @@ class SubscriptionSerializer(UserListSerializer):
             'first_name', 'last_name', 'is_subscribed',
             # 'recipe', 'recipes_count'
             )
-        read_only_fields = ("__all__",)
+        read_only_fields = ('email', 'username', 'first_name',
+                            'last_name', 'is_subscribed',)
+
+
+class SubscribeSerializer(serializers.ModelSerializer):
+    """Сериализатор для подписки/отписки от пользователей."""
+    class Meta:
+        model = Follow
+        fields = '__all__'
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Follow.objects.all(),
+                fields=('user', 'following'),
+                message='Вы уже подписаны на этого пользователя'
+            )
+        ]
+
+    def validate(self, data):
+        request = self.context.get('request')
+        if request.user == data['following']:
+            raise serializers.ValidationError(
+                'Нельзя подписаться на самого себя.'
+            )
+        return data
+    
+
+def to_representation(self, instance):
+    return SubscriptionSerializer(
+        instance.following, context=self.context).data
+
+    # def to_representation(self, instance):
+    #     print(instance)
+    #     request = self.context.get('request')
+    #     raise Exception(instance.following, type(instance.following), dir(instance.following))
+    #     return SubscriptionSerializer(
+    #         instance.following.id,
+    #         context={'request': request}).data
+
+
+# class SubscribeSerializer(serializers.ModelSerializer,
+                          
+#                           SubscribeMixin):
+#     """Подписка на пользователя"""   
+#     is_subscribed = SubscribeMixin.is_subscribed
+
+#     class Meta:
+#         model = Follow
+#         fields = ('email', 'id', 'username',
+#             'first_name', 'last_name', 'is_subscribed',
+#             # 'recipe', 'recipes_count'
+#             )
+
+#     def validate(self, data):
+#         print(data)
+#         request = self.context.get('request')
+#         following = self.context.get('following')
+#         print(following)
+#         if request.user.id == following:
+#             raise serializers.ValidationError(
+#                 'Нельзя подписаться на себя.'
+#             )
+#         check_subscribe = Follow.objects.filter(
+#             user=request.user, following=following).exists()
+#         if check_subscribe:
+#             raise serializers.ValidationError(
+#                 'Вы уже подписаны на этого пользователя'
+#             )
+#         return data
