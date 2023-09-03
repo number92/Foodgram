@@ -88,47 +88,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
                 'Нельзя подписаться на самого себя.'
             )
         return data
-    
 
-def to_representation(self, instance):
-    return SubscriptionSerializer(
-        instance.following, context=self.context).data
-
-    # def to_representation(self, instance):
-    #     print(instance)
-    #     request = self.context.get('request')
-    #     raise Exception(instance.following, type(instance.following), dir(instance.following))
-    #     return SubscriptionSerializer(
-    #         instance.following.id,
-    #         context={'request': request}).data
-
-
-# class SubscribeSerializer(serializers.ModelSerializer,
-                          
-#                           SubscribeMixin):
-#     """Подписка на пользователя"""   
-#     is_subscribed = SubscribeMixin.is_subscribed
-
-#     class Meta:
-#         model = Follow
-#         fields = ('email', 'id', 'username',
-#             'first_name', 'last_name', 'is_subscribed',
-#             # 'recipe', 'recipes_count'
-#             )
-
-#     def validate(self, data):
-#         print(data)
-#         request = self.context.get('request')
-#         following = self.context.get('following')
-#         print(following)
-#         if request.user.id == following:
-#             raise serializers.ValidationError(
-#                 'Нельзя подписаться на себя.'
-#             )
-#         check_subscribe = Follow.objects.filter(
-#             user=request.user, following=following).exists()
-#         if check_subscribe:
-#             raise serializers.ValidationError(
-#                 'Вы уже подписаны на этого пользователя'
-#             )
-#         return data
+    def to_representation(self, instance):
+        return SubscriptionSerializer(
+            instance.following, context=self.context).data
