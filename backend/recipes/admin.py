@@ -16,14 +16,19 @@ class RecipeAdmin(admin.ModelAdmin):
 
 @admin.register(models.Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ('name', 'measurement_unit')
-    search_fields = ("name",)
+    list_display = ('id', 'name', 'measurement_unit')
+    search_fields = ('name', 'id')
+
 
 @admin.register(models.SumIngredients)
 class SumIngredientsAdmin(admin.ModelAdmin):
     list_display = ('id', 'amount',)
     list_editable = ('amount',)
-    empty_value_display = '-------'
+
+
+@admin.register(models.Favorite)
+class FavoritetAdmin(admin.ModelAdmin):
+    list_display = ('user', 'recipe')
 
 
 @admin.register(models.ShoppingList)
