@@ -2,23 +2,18 @@ import os
 
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+from dotenv import load_dotenv
+
+load_dotenv()
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+SECRET_KEY = str(os.getenv('SECRET_KEY'))
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-jg%rw#u=8h+&8%d79jd$h8(6qaf8zk0mqy2(f@xromh4^p!i*y'
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'backend', 'db']
 
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -27,6 +22,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_filters',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'djoser',
+    'users.apps.UsersConfig',
+    'api.apps.ApiConfig',
+    'recipes.apps.RecipesConfig',
 ]
 
 MIDDLEWARE = [
@@ -60,18 +62,21 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': os.getenv('ENGINE',
+                            default='django.db.backends.postgresql'),
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT')
     }
 }
 
+
+AUTH_USER_MODEL = "users.User"
 # Password validation
-# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -89,8 +94,43 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/3.2/topics/i18n/
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ],
+    'DEFAULT_PAGINATION_CLASS': [
+        'api.pagination.LimitPagination',
+    ],
+    'PAGE_SIZE': 5,
+    'SEARCH_PARAM': 'name',
+}
+
+DJOSER = {
+       'LOGIN_FIELD': 'email',
+       'SERIALIZERS': {
+            'user_create': 'api.serializers.UserWriteSerializer',
+            'user': 'api.serializers.UserListSerializer',
+            'current_user': 'api.serializers.UserListSerializer',
+            'set_password': 'djoser.serializers.SetPasswordSerializer'
+       },
+       'HIDE_USERS': False,
+       'PERMISSIONS': {
+           'user_list': ['rest_framework.permissions.AllowAny'],
+           'user': ['djoser.permissions.CurrentUserOrAdminOrReadOnly'],
+           'activation': ['rest_framework.permissions.IsAdminUser'],
+           'password_reset': ['rest_framework.permissions.IsAdminUser'],
+           'password_reset_confirm': ['rest_framework.permissions.IsAdminUser'],
+           'set_password': ['djoser.permissions.CurrentUserOrAdmin'],
+           'username_reset': ['rest_framework.permissions.IsAdminUser'],
+           'username_reset_confirm': ['rest_framework.permissions.IsAdminUser'],
+       },
+   }
 
 LANGUAGE_CODE = 'en-ru'
 
@@ -104,21 +144,26 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.2/howto/static-files/
+
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Registration user settings
+# Registration user model settings
 EXCEPTION_CHARACTERS = r'[^\w.@+-]'
-NAME_LENGTH = 150
+NAME_LENGHT = 150
 MIN_USERNAME = 3
 MAX_USERNAME = 24
-EMAIL_LENGTH = 254
-COLOR_LENGTH = 7
+EMAIL_LENGHT = 254
+COLOR_LENGHT = 7
 UNIT_LENGHT = 24
 TEXT_LENGHT = 3000
+MIN_AMOUNT = 1
+# Download shopping_list
+FILE_NAME = 'shopping_cart.txt'
