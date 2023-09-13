@@ -15,7 +15,7 @@ class Command(BaseCommand):
 
 
 def ingredients_load():
-    with open('../data/ingredients.csv',
+    with open('./data/ingredients.csv',
               encoding='utf-8') as csv_file:
         fieldnames = ['name', 'measurement_unit']
         csv_reader = csv.DictReader(csv_file, fieldnames=fieldnames)
