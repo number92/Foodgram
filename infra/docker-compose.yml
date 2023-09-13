@@ -15,7 +15,6 @@ services:
   backend:
     container_name: backend
     image: number92/foodgram_backend
-    
     env_file: 
       - ../.env
     volumes:

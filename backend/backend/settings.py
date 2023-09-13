@@ -1,5 +1,4 @@
 import os
-
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -112,25 +111,25 @@ REST_FRAMEWORK = {
 }
 
 DJOSER = {
-       'LOGIN_FIELD': 'email',
-       'SERIALIZERS': {
-            'user_create': 'api.serializers.UserWriteSerializer',
-            'user': 'api.serializers.UserListSerializer',
-            'current_user': 'api.serializers.UserListSerializer',
-            'set_password': 'djoser.serializers.SetPasswordSerializer'
-       },
-       'HIDE_USERS': False,
-       'PERMISSIONS': {
-           'user_list': ['rest_framework.permissions.AllowAny'],
-           'user': ['djoser.permissions.CurrentUserOrAdminOrReadOnly'],
-           'activation': ['rest_framework.permissions.IsAdminUser'],
-           'password_reset': ['rest_framework.permissions.IsAdminUser'],
-           'password_reset_confirm': ['rest_framework.permissions.IsAdminUser'],
-           'set_password': ['djoser.permissions.CurrentUserOrAdmin'],
-           'username_reset': ['rest_framework.permissions.IsAdminUser'],
-           'username_reset_confirm': ['rest_framework.permissions.IsAdminUser'],
-       },
-   }
+    'LOGIN_FIELD': 'email',
+    'SERIALIZERS': {
+        'user_create': 'api.serializers.UserWriteSerializer',
+        'user': 'api.serializers.UserListSerializer',
+        'current_user': 'api.serializers.UserListSerializer',
+        'set_password': 'djoser.serializers.SetPasswordSerializer'
+    },
+    'HIDE_USERS': False,
+    'PERMISSIONS': {
+        'user_list': ['rest_framework.permissions.AllowAny'],
+        'user': ['djoser.permissions.CurrentUserOrAdminOrReadOnly'],
+        'activation': ['rest_framework.permissions.IsAdminUser'],
+        'password_reset': ['rest_framework.permissions.IsAdminUser'],
+        'password_reset_confirm': ['rest_framework.permissions.IsAdminUser'],
+        'set_password': ['djoser.permissions.CurrentUserOrAdmin'],
+        'username_reset': ['rest_framework.permissions.IsAdminUser'],
+        'username_reset_confirm': ['rest_framework.permissions.IsAdminUser']
+    }
+}
 
 LANGUAGE_CODE = 'en-ru'
 

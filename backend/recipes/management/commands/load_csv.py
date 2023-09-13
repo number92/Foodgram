@@ -1,6 +1,7 @@
 import csv
 
 from django.core.management.base import BaseCommand
+
 from recipes.models import Ingredient
 
 
@@ -22,5 +23,4 @@ def ingredients_load():
         for row in csv_reader:
             Ingredient.objects.get_or_create(
                 name=row['name'],
-                measurement_unit=row['measurement_unit']
-                )
+                measurement_unit=row['measurement_unit'])

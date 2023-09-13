@@ -1,28 +1,24 @@
+from django.conf import settings
 from django.db.models import Sum
 from django.http import HttpResponse
-from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet as DjoserViewSet
-from rest_framework.response import Response
-from rest_framework import viewsets, status, filters
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 
-from api.permissions import CurrentUserOrAdminOrReadOnly
-from api.pagination import LimitPagination
 from api.filters import RecipeFilter
-from api.serializers import (
-    SubscriptionSerializer, SubscribeSerializer,
-    TagSerializer, IngredientSerializer,
-    RecipeGetSerializer, RecipeCreateSerializer,
-    SummaryRecipesSerializer
-    )
-from users.models import User, Follow
-from recipes.models import (
-    Tag, Ingredient, Recipe, Favorite,
-    ShoppingList, SumIngredients
-)
+from api.pagination import LimitPagination
+from api.permissions import CurrentUserOrAdminOrReadOnly
+from api.serializers import (IngredientSerializer, RecipeCreateSerializer,
+                             RecipeGetSerializer, SubscribeSerializer,
+                             SubscriptionSerializer, SummaryRecipesSerializer,
+                             TagSerializer)
+from recipes.models import (Favorite, Ingredient, Recipe, ShoppingList,
+                            SumIngredients, Tag)
+from users.models import Follow, User
 
 
 class UserViewSet(DjoserViewSet):
@@ -166,31 +162,27 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 recipe_id=recipe).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(
-            detail=False,
+    @action(detail=False,
             permission_classes=(IsAuthenticated,),
-            methods=['GET']
-            )
+            methods=['GET'])
     def download_shopping_cart(self, request):
-        ingredients = (
-            SumIngredients.objects.filter(
-                recipe__recipe_list__user=request.user
-                ).values('ingredient').annotate(
-                    total_amount=Sum('amount')
-                    ).values_list(
-                        'ingredient__name',
-                        'total_amount',
-                        'ingredient__measurement_unit'
-                    )
-            )
+        ingredients = (SumIngredients.objects.filter(
+            recipe__recipe_list__user=request.user)
+            .values('ingredient')
+            .annotate(total_amount=Sum('amount'))
+            .values_list(
+                'ingredient__name',
+                'total_amount',
+                'ingredient__measurement_unit'
+        ))
         file_list = []
         [file_list.append(
             '{} - {} {}.'.format(*ingredient)) for ingredient in ingredients]
         response = HttpResponse(
             'Cписок покупок:\n' + '\n'.join(file_list),
             content_type='text/plain'
-            )
+        )
         response['Content-Disposition'] = (
             f'attachment; filename={settings.FILE_NAME}'
-            )
+        )
         return response

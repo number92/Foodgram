@@ -1,19 +1,13 @@
 from django.db import transaction
-
-from djoser.serializers import UserSerializer, UserCreateSerializer
-
+from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
-
-
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from users.models import User, Follow
-from recipes.models import (
-    Tag, Ingredient, Recipe, SumIngredients,
-    Favorite, ShoppingList
-)
 from api.utils import ingredient_list_for_recipe
+from recipes.models import (Favorite, Ingredient, Recipe, ShoppingList,
+                            SumIngredients, Tag)
+from users.models import Follow, User
 
 
 class SummaryRecipesSerializer(serializers.ModelSerializer):

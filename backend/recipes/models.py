@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
+
 from users.models import User
 
 
@@ -138,7 +139,7 @@ class SumIngredients(models.Model):
         return (
             f'{self.recipe.name}: '
             f'{self.ingredient.name} - {amount_unit}'
-            )
+        )
 
 
 class Favorite(models.Model):
