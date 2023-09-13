@@ -14,10 +14,8 @@ services:
       - pg_data_foodgram:/var/lib/postgresql/data
   backend:
     container_name: backend
-    # image: number92/foodgram_backend
-    build:
-        context: ../backend
-        dockerfile: Dockerfile
+    image: number92/foodgram_backend
+    
     env_file: 
       - ../.env
     volumes:
