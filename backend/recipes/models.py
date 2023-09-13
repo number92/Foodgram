@@ -79,20 +79,20 @@ class Recipe(models.Model):
         unique=True,
     )
     pub_date = models.DateTimeField(
-        verbose_name="Дата публикации",
+        verbose_name='Дата публикации',
         auto_now_add=True,
         editable=False,
     )
     image = models.ImageField(
-        verbose_name="Изображение блюда",
-        upload_to="media/recipe/images/",
+        verbose_name='Изображение блюда',
+        upload_to='recipe/images/',
     )
     text = models.TextField(
-        verbose_name="Описание блюда",
+        verbose_name='Описание блюда',
         max_length=settings.TEXT_LENGHT
     )
     cooking_time = models.PositiveSmallIntegerField(
-        verbose_name="Время приготовления",
+        verbose_name='Время приготовления',
         default=0
     )
 

@@ -165,8 +165,8 @@ class SumIngredientsSerializer(serializers.ModelSerializer):
 class RecipeGetSerializer(serializers.ModelSerializer):
     """Сериализатор для получения списка рецептов."""
     tags = TagSerializer(many=True, read_only=True)
-    author = UserSerializer(read_only=True)
-    ingredients = SumIngredientsSerializer(
+    author = UserListSerializer(read_only=True)
+    ingredients = SumIngredientGetSerializer(
         many=True, read_only=True, source='recipes'
     )
     is_favorited = serializers.SerializerMethodField()

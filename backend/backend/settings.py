@@ -12,7 +12,7 @@ SECRET_KEY = str(os.getenv('SECRET_KEY'))
 
 DEBUG = os.getenv('DEBUG', 'false').lower() == 'true'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'backend', 'db']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'backend', 'db' 'foodgramdb']
 
 
 INSTALLED_APPS = [
@@ -150,7 +150,7 @@ STATIC_URL = '/static/backend_static/'
 STATIC_ROOT = '/static/backend_static/'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = '/media'
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
