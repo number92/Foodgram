@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import transaction
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
@@ -43,7 +44,7 @@ class SubscribeMixin(serializers.ModelSerializer):
 
     def get_is_subscribed(self, obj):
         user_id = obj.id if isinstance(obj, User) else obj.user.id
-        request_user = self.context.get('request').user.id
+        request_user = self.context['request'].user.id
         queryset = Follow.objects.filter(
             user=user_id,
             following=request_user).exists()
@@ -70,6 +71,8 @@ class UserWriteSerializer(UserCreateSerializer):
         fields = ('email', 'id', 'username',
                   'first_name', 'last_name',
                   'password')
+        # в модели User(AbstractUSer) эти поля по умолчанию blank=true,
+        # определить эти поля здесь мне показалось более гибким
         extra_kwargs = {
             'first_name': {'required': True, 'allow_blank': False},
             'last_name': {'required': True, 'allow_blank': False},
@@ -107,7 +110,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
-        request = self.context.get('request')
+        request = self.context['request']
         if request.user == data['following']:
             raise serializers.ValidationError(
                 'Нельзя подписаться на самого себя.'
@@ -150,6 +153,11 @@ class SumIngredientGetSerializer(serializers.ModelSerializer):
 class SumIngredientsSerializer(serializers.ModelSerializer):
     """Сериализатор для добавления ингредиентов"""
     id = serializers.IntegerField()
+    # поле проходит валидацию в модели, нужно ли делать в сериализаторе?
+    amount = serializers.IntegerField(
+        min_value=settings.MIN_AMOUNT,
+        max_value=settings.MAX_AMOUNT
+    )
 
     class Meta:
         model = SumIngredients
@@ -174,14 +182,14 @@ class RecipeGetSerializer(serializers.ModelSerializer):
                   'image', 'text', 'cooking_time')
 
     def get_is_favorited(self, obj):
-        request = self.context.get('request')
+        request = self.context['request']
         return (request and request.user.is_authenticated
                 and Favorite.objects.filter(
                     user=request.user, recipe=obj
                 ).exists())
 
     def get_is_in_shopping_cart(self, obj):
-        request = self.context.get('request')
+        request = self.context['request']
         return (request and request.user.is_authenticated
                 and ShoppingList.objects.filter(
                     user=request.user, recipe_id=obj
@@ -196,6 +204,10 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     )
     image = Base64ImageField()
     ingredients = SumIngredientsSerializer(many=True, source='recipes')
+    cooking_time = serializers.IntegerField(
+        min_value=settings.MIN_AMOUNT,
+        max_value=settings.MAX_AMOUNT
+    )
 
     class Meta:
         model = Recipe
@@ -203,14 +215,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                   'tags', 'image',
                   'name', 'text',
                   'cooking_time')
-        extra_kwargs = {
-            'ingredients': {'required': True, 'allow_blank': False},
-            'tags': {'required': True, 'allow_blank': False},
-            'name': {'required': True, 'allow_blank': False},
-            'text': {'required': True, 'allow_blank': False},
-            'image': {'required': True, 'allow_blank': False},
-            'cooking_time': {'required': True},
-        }
 
     def validate(self, obj):
         if not obj.get('tags'):
@@ -223,10 +227,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             )
         ingredients_list = []
         for ingredient in obj.get('recipes'):
-            if ingredient.get('amount') <= 0:
-                raise serializers.ValidationError(
-                    'Количество не может быть меньше 1'
-                )
             ingredients_list.append(ingredient.get('id'))
         if len(set(ingredients_list)) != len(ingredients_list):
             raise serializers.ValidationError(
@@ -236,7 +236,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        request = self.context.get('request')
+        request = self.context['request']
         ingredients = validated_data.pop('recipes')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(

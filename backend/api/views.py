@@ -15,7 +15,7 @@ from api.permissions import CurrentUserOrAdminOrReadOnly
 from api.serializers import (IngredientSerializer, RecipeCreateSerializer,
                              RecipeGetSerializer, SubscribeSerializer,
                              SubscriptionSerializer, SummaryRecipesSerializer,
-                             TagSerializer)
+                             TagSerializer, UserListSerializer)
 from recipes.models import (Favorite, Ingredient, Recipe, ShoppingList,
                             SumIngredients, Tag)
 from users.models import Follow, User
@@ -30,6 +30,14 @@ class UserViewSet(DjoserViewSet):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     pagination_class = LimitPagination
+
+    @action(detail=False, methods=['GET'],
+            pagination_class=None,
+            permission_classes=(IsAuthenticated,))
+    def me(self, request):
+        serializer = UserListSerializer(request.user)
+        return Response(serializer.data,
+                        status=status.HTTP_200_OK)
 
     @action(detail=False,
             permission_classes=(IsAuthenticated,))
@@ -89,12 +97,13 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
+    """Представление для рецептов"""
     queryset = Recipe.objects.all()
     permission_classes = (CurrentUserOrAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     pagination_class = LimitPagination
-    http_method_names = ["get", "post", "patch", "delete"]
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
@@ -112,7 +121,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if request.method == 'POST':
             serializer = SummaryRecipesSerializer(
                 recipe, data=request.data,
-                context={"request": request}
+                context={'request': request}
             )
             serializer.is_valid(raise_exception=True)
             if not Favorite.objects.filter(
@@ -143,7 +152,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if request.method == 'POST':
             serializer = SummaryRecipesSerializer(
                 recipe, data=request.data,
-                context={"request": request}
+                context={'request': request}
             )
             serializer.is_valid(raise_exception=True)
             if not ShoppingList.objects.filter(

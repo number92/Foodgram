@@ -164,5 +164,6 @@ COLOR_LENGHT = 7
 UNIT_LENGHT = 24
 TEXT_LENGHT = 3000
 MIN_AMOUNT = 1
+MAX_AMOUNT = 32000
 # Download shopping_list
 FILE_NAME = 'shopping_cart.txt'
