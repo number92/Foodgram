@@ -10,7 +10,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             ingredients_load()
-            print('ингредиенты загружены')
+            print('Ингредиенты загружены')
         except Exception as er:
             print(er)
 
@@ -23,4 +23,5 @@ def ingredients_load():
         for row in csv_reader:
             Ingredient.objects.get_or_create(
                 name=row['name'],
-                measurement_unit=row['measurement_unit'])
+                measurement_unit=row['measurement_unit']
+            )

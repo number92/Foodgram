@@ -27,31 +27,36 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
-        ordering = ('username',)
+        ordering = ['username', 'email']
 
     def __str__(self):
         return self.username
 
 
 class Follow(models.Model):
-    user = models.ForeignKey(User,
-                             on_delete=models.CASCADE,
-                             related_name='follower',
-                             verbose_name='Подписчик')
-    following = models.ForeignKey(User,
-                                  on_delete=models.CASCADE,
-                                  related_name='following',
-                                  verbose_name='Подписаться')
-
-    def __str__(self) -> str:
-        return (f'{self.user}, {self.following.username}')
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='follower',
+        verbose_name='Подписчик'
+    )
+    following = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='following',
+        verbose_name='Подписаться'
+    )
 
     class Meta:
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
+        ordering = ['-user_id']
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'following'],
                 name='unique_user_following'
             )
         ]
+
+    def __str__(self) -> str:
+        return (f'{self.user}, {self.following.username}')

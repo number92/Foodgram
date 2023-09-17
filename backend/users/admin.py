@@ -9,7 +9,7 @@ class UserAdmin(admin.ModelAdmin):
         'username', 'id', 'email', 'password', 'first_name', 'last_name',
     )
     list_editable = ('password', )
-    list_filter = ('username',)
+    list_filter = ('username', 'email')
     search_fields = ('username', 'email')
 
 

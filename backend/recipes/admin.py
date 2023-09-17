@@ -1,6 +1,11 @@
 from django.contrib import admin
-
+from django.conf import settings
 from . import models
+
+
+class SumIngredientsInline(admin.TabularInline):
+    model = models.SumIngredients
+    min_num = settings.MIN_AMOUNT
 
 
 @admin.register(models.Tag)
@@ -13,6 +18,7 @@ class TagAdmin(admin.ModelAdmin):
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('id', 'author', 'name', 'image',
                     'text', 'cooking_time')
+    inlines = (SumIngredientsInline,)
 
 
 @admin.register(models.Ingredient)

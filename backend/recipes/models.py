@@ -1,5 +1,8 @@
 from django.conf import settings
-from django.core.validators import MinValueValidator
+from django.core.validators import (
+    MinValueValidator as min_value,
+    MaxValueValidator as max_value
+)
 from django.db import models
 
 from users.models import User
@@ -24,6 +27,7 @@ class Tag(models.Model):
     class Meta:
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
+        ordering = ['-id']
 
     def __str__(self):
         return self.name
@@ -43,6 +47,7 @@ class Ingredient(models.Model):
         ordering = ['name']
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
+        ordering = ['name']
         constraints = [
             models.UniqueConstraint(
                 fields=['name', 'measurement_unit'],
@@ -94,7 +99,10 @@ class Recipe(models.Model):
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления',
-        default=0
+        validators=[
+            min_value(settings.MIN_AMOUNT),
+            max_value(settings.MAX_AMOUNT)
+        ]
     )
 
     class Meta:
@@ -119,14 +127,18 @@ class SumIngredients(models.Model):
         related_name='ingredients',
         verbose_name='Ингредиент'
     )
-    amount = models.IntegerField(
+    amount = models.PositiveSmallIntegerField(
         'Количество',
-        validators=[MinValueValidator(settings.MIN_AMOUNT)]
+        validators=[
+            min_value(settings.MIN_AMOUNT),
+            max_value(settings.MAX_AMOUNT)
+        ]
     )
 
     class Meta:
         verbose_name = 'Ингредиенты в рецепте'
         verbose_name_plural = 'Ингредиенты в рецептах'
+        ordering = ['recipe']
         constraints = [
             models.UniqueConstraint(
                 fields=['recipe', 'ingredient'],
@@ -188,6 +200,7 @@ class ShoppingList(models.Model):
     class Meta:
         verbose_name = 'Список рецептов'
         verbose_name_plural = 'Список рецептов'
+        ordering = ['-id']
 
     def __str__(self):
         return f'{self.user.username} - {self.recipe_id.name}'
