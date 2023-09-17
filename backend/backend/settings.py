@@ -9,6 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = str(os.getenv('SECRET_KEY'))
 
+
 DEBUG = os.getenv('DEBUG', 'false').lower() == 'true'
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'backend', 'db', '158.160.77.172']
@@ -121,7 +122,7 @@ DJOSER = {
     'HIDE_USERS': False,
     'PERMISSIONS': {
         'user_list': ['rest_framework.permissions.AllowAny'],
-        'user': ['djoser.permissions.CurrentUserOrAdminOrReadOnly'],
+        'user': ['djoser.permissions.CurrentUserOrAdminOrReadOnly'],    
         'activation': ['rest_framework.permissions.IsAdminUser'],
         'password_reset': ['rest_framework.permissions.IsAdminUser'],
         'password_reset_confirm': ['rest_framework.permissions.IsAdminUser'],
@@ -131,7 +132,7 @@ DJOSER = {
     }
 }
 
-LANGUAGE_CODE = 'en-ru'
+LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'UTC'
 

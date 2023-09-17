@@ -14,7 +14,6 @@ from users.models import Follow, User
 class SummaryRecipesSerializer(serializers.ModelSerializer):
     """Краткая информация о рецепте"""
     class Meta:
-
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
         read_only_fields = ('id', 'name', 'image', 'cooking_time')
@@ -43,12 +42,8 @@ class SubscribeMixin(serializers.ModelSerializer):
         return serializer.data
 
     def get_is_subscribed(self, obj):
-        user_id = obj.id if isinstance(obj, User) else obj.user.id
         request_user = self.context['request'].user.id
-        queryset = Follow.objects.filter(
-            user=user_id,
-            following=request_user).exists()
-        return queryset
+        return obj.following.filter(user=request_user).exists()
 
 
 class UserListSerializer(UserSerializer, SubscribeMixin):
@@ -183,17 +178,17 @@ class RecipeGetSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):
         request = self.context['request']
-        return (request and request.user.is_authenticated
-                and Favorite.objects.filter(
-                    user=request.user, recipe=obj
-                ).exists())
+        return (
+            request and request.user.is_authenticated
+            and obj.favorites.filter(user=request.user.id).exists()
+        )
 
     def get_is_in_shopping_cart(self, obj):
         request = self.context['request']
-        return (request and request.user.is_authenticated
-                and ShoppingList.objects.filter(
-                    user=request.user, recipe_id=obj
-                ).exists())
+        return (
+            request and request.user.is_authenticated
+            and obj.recipe_list.filter(user=request.user).exists()
+        )
 
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
@@ -256,3 +251,45 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         ingredient_list_for_recipe(ingredients, instance)
         instance.save()
         return instance
+
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    """Сериализатор для работы с избранными рецептами."""
+    class Meta:
+        model = Favorite
+        fields = '__all__'
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Favorite.objects.all(),
+                fields=('user', 'recipe'),
+                message='Рецепт уже добавлен в избранное'
+            )
+        ]
+
+    def to_representation(self, instance):
+        request = self.context['request']
+        return SummaryRecipesSerializer(
+            instance.recipe,
+            context={'request': request}
+        ).data
+
+
+class ShoppingListSerializer(serializers.ModelSerializer):
+    """Сериализатор для работы со списком покупок."""
+    class Meta:
+        model = ShoppingList
+        fields = ('user', 'recipe_id')
+        validators = [
+            UniqueTogetherValidator(
+                queryset=ShoppingList.objects.all(),
+                fields=('user', 'recipe_id'),
+                message='Рецепт уже добавлен в список покупок'
+            )
+        ]
+
+    def to_representation(self, instance):
+        request = self.context['request']
+        return SummaryRecipesSerializer(
+            instance.recipe_id,
+            context={'request': request}
+        ).data
