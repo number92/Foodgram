@@ -1,8 +1,6 @@
 from django.conf import settings
-from django.core.validators import (
-    MinValueValidator as min_value,
-    MaxValueValidator as max_value
-)
+from django.core.validators import MaxValueValidator as max_value
+from django.core.validators import MinValueValidator as min_value
 from django.db import models
 
 from users.models import User
