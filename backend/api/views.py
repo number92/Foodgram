@@ -142,7 +142,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':
             serializer = ShoppingListSerializer(
-                recipe, 
+                recipe,
                 data={'user': request.user.id,
                       'recipe_id': pk},
                 context={'request': request}
