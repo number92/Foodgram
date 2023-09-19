@@ -66,8 +66,6 @@ class UserWriteSerializer(UserCreateSerializer):
         fields = ('email', 'id', 'username',
                   'first_name', 'last_name',
                   'password')
-        # в модели User(AbstractUSer) эти поля по умолчанию blank=true,
-        # определить эти поля здесь мне показалось более гибким
         extra_kwargs = {
             'first_name': {'required': True, 'allow_blank': False},
             'last_name': {'required': True, 'allow_blank': False},
@@ -148,7 +146,6 @@ class SumIngredientGetSerializer(serializers.ModelSerializer):
 class SumIngredientsSerializer(serializers.ModelSerializer):
     """Сериализатор для добавления ингредиентов"""
     id = serializers.IntegerField()
-    # поле проходит валидацию в модели, нужно ли делать в сериализаторе?
     amount = serializers.IntegerField(
         min_value=settings.MIN_AMOUNT,
         max_value=settings.MAX_AMOUNT
